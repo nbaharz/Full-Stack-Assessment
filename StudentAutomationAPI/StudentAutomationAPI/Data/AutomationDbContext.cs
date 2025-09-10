@@ -25,14 +25,7 @@ namespace StudentAutomationAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Enrollment → composite key
-            modelBuilder.Entity<Enrollment>()
-                .HasKey(e => new { e.StudentId, e.CourseId });
 
-
-     
-
-           
         }
     }
 }

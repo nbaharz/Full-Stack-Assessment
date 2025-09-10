@@ -1,6 +1,6 @@
 ﻿namespace StudentAutomationAPI.Entities
 {
-    public class CourseStudent
+    public class CourseStudent:BaseEntity
     {
         public Guid CourseId { get; set; }
         public Guid StudentId { get; set; }
