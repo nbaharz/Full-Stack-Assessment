@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using StudentAutomationAPI.Data;
 
 namespace StudentAutomationAPI
 {
@@ -7,25 +9,28 @@ namespace StudentAutomationAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // PostgreSQL DbContext
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<AutomationDbContext>(options =>
+                options.UseNpgsql(connectionString));
 
+            // Add services to the container
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+
+            // Swagger her zaman açýk
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
+            // Her zaman Swagger aktif
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
-            app.UseHttpsRedirection();
+            // Docker’da HTTPS kullanmadýðýmýz için kaldýrdýk
+            // app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
