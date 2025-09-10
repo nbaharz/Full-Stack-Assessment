@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StudentAutomationAPI.Data;
+using StudentAutomationAPI.DI;
 
 namespace StudentAutomationAPI
 {
@@ -17,9 +18,12 @@ namespace StudentAutomationAPI
             // Add services to the container
             builder.Services.AddControllers();
 
-            // Swagger her zaman açýk
+            // Swagger UI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            //Dependency Injection
+            RepositoryDI.Init(builder.Services);
 
             var app = builder.Build();
 
@@ -27,8 +31,8 @@ namespace StudentAutomationAPI
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            // Docker’da HTTPS kullanmadýðýmýz için kaldýrdýk
-            // app.UseHttpsRedirection();
+            
+            app.UseHttpsRedirection();
 
             app.UseAuthorization();
             app.MapControllers();
