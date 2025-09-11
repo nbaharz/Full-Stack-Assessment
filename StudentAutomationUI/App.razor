@@ -1,4 +1,6 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿@inject StudentAutomationUI.Services.TokenService TokenService
+
+<Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="InitializeAuth">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -9,4 +11,12 @@
             <p role="alert">Sorry, there's nothing at this address.</p>
         </LayoutView>
     </NotFound>
+    
 </Router>
+
+@code {
+    private async Task InitializeAuth(NavigationContext _)
+    {
+        await TokenService.InitializeAsync();
+    }
+}

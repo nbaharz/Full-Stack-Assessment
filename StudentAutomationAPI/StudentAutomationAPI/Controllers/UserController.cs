@@ -13,10 +13,12 @@ namespace StudentAutomationAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, ITokenService tokenService)
         {
             _userService = userService;
+            _tokenService = tokenService;
         }
 
         [HttpGet]
@@ -58,15 +60,8 @@ namespace StudentAutomationAPI.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             var created = await _userService.RegisterAsync(dto);
-
-            var result = new UserDto
-            {
-                Email = created.Email,
-                FullName = created.FullName,
-                Role = created.Role
-            };
-
-            return Ok(result);
+            var token = _tokenService.GenerateToken(created);
+            return Ok(new { token });
         }
 
         [HttpPost("login")]
@@ -75,15 +70,8 @@ namespace StudentAutomationAPI.Controllers
         {
             var user = await _userService.LoginAsync(dto.Email, dto.Password);
             if (user == null) return Unauthorized();
-
-            var result = new UserDto
-            {
-                Email = user.Email,
-                FullName = user.FullName,
-                Role = user.Role
-            };
-
-            return Ok(result);
+            var token = _tokenService.GenerateToken(user);
+            return Ok(new { token });
         }
     }
 

@@ -1,0 +1,224 @@
+@page "/dashboard"
+@using StudentAutomationUI.Services
+@using StudentAutomationUI.Models
+@inject AuthService AuthService
+@inject DataService DataService
+@inject NavigationManager Navigation
+
+<PageTitle>Dashboard</PageTitle>
+
+@if (AuthService.IsAuthenticated)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Dashboard</h2>
+                    <div>
+                        <span class="badge bg-primary me-2">@AuthService.CurrentUser?.Role</span>
+                        <span>Welcome, @AuthService.CurrentUser?.FirstName @AuthService.CurrentUser?.LastName</span>
+                        <button class="btn btn-outline-secondary btn-sm ms-3" @onclick="Logout">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (AuthService.CurrentUser?.Role == UserRole.Admin)
+        {
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@studentCount</h4>
+                                    <p class="mb-0">Students</p>
+                                </div>
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/students" class="text-white text-decoration-none">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@teacherCount</h4>
+                                    <p class="mb-0">Teachers</p>
+                                </div>
+                                <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/teachers" class="text-white text-decoration-none">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@courseCount</h4>
+                                    <p class="mb-0">Courses</p>
+                                </div>
+                                <i class="fas fa-book fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/courses" class="text-white text-decoration-none">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>@gradeCount</h4>
+                                    <p class="mb-0">Grades</p>
+                                </div>
+                                <i class="fas fa-graduation-cap fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/grades" class="text-white text-decoration-none">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <a href="/students" class="btn btn-outline-primary w-100">Manage Students</a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="/teachers" class="btn btn-outline-success w-100">Manage Teachers</a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="/courses" class="btn btn-outline-info w-100">Manage Courses</a>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <a href="/grades" class="btn btn-outline-warning w-100">Manage Grades</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (AuthService.CurrentUser?.Role == UserRole.Teacher)
+        {
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>My Courses</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Manage your courses and view student progress.</p>
+                            <a href="/courses" class="btn btn-primary">View Courses</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Grade Management</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Enter and manage student grades.</p>
+                            <a href="/grades" class="btn btn-success">Manage Grades</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (AuthService.CurrentUser?.Role == UserRole.Student)
+        {
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>My Grades</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>View your grades and academic progress.</p>
+                            <a href="/grades" class="btn btn-primary">View Grades</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>My Courses</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>View your enrolled courses.</p>
+                            <a href="/courses" class="btn btn-info">View Courses</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="alert alert-warning text-center">
+                    <h4>Please Login</h4>
+                    <p>You need to be logged in to access the dashboard.</p>
+                    <a href="/login" class="btn btn-primary">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private int studentCount = 0;
+    private int teacherCount = 0;
+    private int courseCount = 0;
+    private int gradeCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthService.IsAuthenticated)
+        {
+            var students = await DataService.GetStudentsAsync();
+            var teachers = await DataService.GetTeachersAsync();
+            var courses = await DataService.GetCoursesAsync();
+            var grades = await DataService.GetGradesAsync();
+
+            studentCount = students.Count;
+            teacherCount = teachers.Count;
+            courseCount = courses.Count;
+            gradeCount = grades.Count;
+        }
+    }
+
+    private void Logout()
+    {
+        AuthService.Logout();
+        Navigation.NavigateTo("/login");
+    }
+}

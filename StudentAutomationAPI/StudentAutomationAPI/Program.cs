@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using StudentAutomationAPI.Data;
 using StudentAutomationAPI.DI;
 
@@ -15,27 +18,66 @@ namespace StudentAutomationAPI
             builder.Services.AddDbContext<AutomationDbContext>(options =>
                 options.UseNpgsql(connectionString));
 
-            // Add services to the container
+            // Add services
             builder.Services.AddControllers();
-
-            // Swagger UI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            //Dependency Injection
+            // Dependency Injection
             RepositoryDI.Init(builder.Services);
             ServiceDI.Init(builder.Services);
 
+            // CORS (dev ortamı için her şeye izin)
+            const string CorsPolicyName = "AllowFrontend";
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(CorsPolicyName, policy =>
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+            });
+
+            // JWT Auth
+            var jwtSection = builder.Configuration.GetSection("Jwt");
+            var jwtKey = jwtSection["Key"] ?? string.Empty;
+            var issuer = jwtSection["Issuer"];
+            var audience = jwtSection["Audience"];
+
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = issuer,
+                        ValidAudience = audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                    };
+                });
+
             var app = builder.Build();
 
-            // Her zaman Swagger aktif
+            // Swagger
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            
-            app.UseHttpsRedirection();
+            // HTTPS yönlendirme yok
+            // app.UseHttpsRedirection();
 
+            // CORS
+            app.UseCors(CorsPolicyName);
+
+            app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapControllers();
 
             app.Run();

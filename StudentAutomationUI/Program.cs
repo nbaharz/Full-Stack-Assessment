@@ -11,7 +11,14 @@ namespace StudentAutomationUI
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            // Point UI HttpClient to backend API (HTTP)
+            builder.Services.AddScoped(sp =>
+                new HttpClient { BaseAddress = new Uri("http://localhost:5000/") });
+
+            builder.Services.AddScoped<Services.IApiService, Services.ApiService>();
+            builder.Services.AddScoped<Services.TokenService>();
+            builder.Services.AddScoped<Services.AuthService>();
+            builder.Services.AddScoped<Services.DataService>();
 
             await builder.Build().RunAsync();
         }
