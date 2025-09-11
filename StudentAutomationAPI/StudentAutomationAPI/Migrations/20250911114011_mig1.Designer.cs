@@ -9,11 +9,11 @@ using StudentAutomationAPI.Data;
 
 #nullable disable
 
-namespace StudentAutomationAPI.Data.Migrations
+namespace StudentAutomationAPI.Migrations
 {
     [DbContext(typeof(AutomationDbContext))]
-    [Migration("20250910160617_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250911114011_mig1")]
+    partial class mig1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,9 +37,11 @@ namespace StudentAutomationAPI.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("StudentId")
                         .HasColumnType("uuid");
@@ -131,7 +133,7 @@ namespace StudentAutomationAPI.Data.Migrations
                     b.ToTable("Courses");
                 });
 
-            modelBuilder.Entity("StudentAutomationAPI.Entities.Enrollment", b =>
+            modelBuilder.Entity("StudentAutomationAPI.Entities.CourseStudent", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -155,7 +157,7 @@ namespace StudentAutomationAPI.Data.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Enrollments");
+                    b.ToTable("CourseStudents");
                 });
 
             modelBuilder.Entity("StudentAutomationAPI.Entities.Grade", b =>
@@ -195,9 +197,6 @@ namespace StudentAutomationAPI.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("EnrollmentDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("StudentNumber")
@@ -266,9 +265,8 @@ namespace StudentAutomationAPI.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -335,7 +333,7 @@ namespace StudentAutomationAPI.Data.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("StudentAutomationAPI.Entities.Enrollment", b =>
+            modelBuilder.Entity("StudentAutomationAPI.Entities.CourseStudent", b =>
                 {
                     b.HasOne("StudentAutomationAPI.Entities.Course", "Course")
                         .WithMany()

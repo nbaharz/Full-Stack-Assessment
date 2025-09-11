@@ -1,6 +1,6 @@
 ﻿namespace StudentAutomationAPI.DTO
 {
-    public class AttendanceAddDto
+    public class AttendanceCreateDto
     {
         public Guid StudentId {  get; set; }
         public Guid CourseId { get; set; }

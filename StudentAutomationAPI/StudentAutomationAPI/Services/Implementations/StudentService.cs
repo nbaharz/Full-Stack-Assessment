@@ -6,13 +6,17 @@ namespace StudentAutomationAPI.Services.Implementations
 {
     public class StudentService : GenericService<Student>, IStudentService
     {
+        private readonly IGenericRepository<Student> _studentRepository;
+
         public StudentService(IGenericRepository<Student> repository) : base(repository)
         {
+            _studentRepository = repository;
         }
 
-        public Task<Student?> GetOwnProfileAsync(Guid studentId)
+        public async Task<Student?> GetOwnProfileAsync(Guid studentId)
         {
-            throw new NotImplementedException();
+            var students = await _studentRepository.FindAsync(s => s.Id == studentId);
+            return students.FirstOrDefault();
         }
     }
 }

@@ -4,7 +4,8 @@ using StudentAutomationAPI.Services.Interfaces;
 
 namespace StudentAutomationAPI.Services.Implementations
 {
-    public class AttendanceService : GenericService<Attendance>, Interfaces.IAttendanceService
+
+    public class AttendanceService : GenericService<Attendance>, IAttendanceService
     {
         private readonly Repositories.Implementations.IAttendanceRepository _attendanceRepository;
         public AttendanceService(Repositories.Implementations.IAttendanceRepository repository) : base(repository)
@@ -12,7 +13,7 @@ namespace StudentAutomationAPI.Services.Implementations
             _attendanceRepository = repository;
         }
 
-        public async Task AddAttendanceAsync(Guid studentId, Guid courseId, DateTime date, string status) //bunu dto yap
+        public async Task AddAttendanceAsync(Guid studentId, Guid courseId, DateTime date, AttendanceStatus status) //bunu dto yap
         {
             var attendance = new Attendance
             {

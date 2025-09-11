@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudentAutomationAPI.Entities;
 using StudentAutomationAPI.Services;
+using StudentAutomationAPI.DTO;
 using StudentAutomationAPI.Services.Interfaces;
 
 namespace StudentAutomationAPI.Controllers
@@ -47,5 +48,5 @@ namespace StudentAutomationAPI.Controllers
         }
     }
 
-    public record LoginDto(string Email, string Password);
+    
 }

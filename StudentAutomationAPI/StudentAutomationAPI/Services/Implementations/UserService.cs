@@ -5,7 +5,7 @@ using StudentAutomationAPI.Services.Interfaces;
 
 namespace StudentAutomationAPI.Services.Implementations
 {
-    public class UserService: IUserService
+    public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
 
@@ -14,24 +14,26 @@ namespace StudentAutomationAPI.Services.Implementations
             _userRepository = userRepository;
         }
 
-        public async Task<User?> LoginAsync(string email, string password)
+        public async Task<User> AddAsync(User entity)
         {
-            var user = (await _userRepository.FindAsync(u => u.Email == email)).FirstOrDefault();
-            if (user == null) return null;
-
-            // solving hash
-            bool isValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
-            return isValid ? user : null;
+            await _userRepository.AddAsync(entity);
+            await _userRepository.SaveChangesAsync();
+            return entity;
         }
 
-        public async Task<User> RegisterAsync(User user)
+        public async Task DeleteAsync(Guid id)
         {
-            // hashing password
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user != null)
+            {
+                _userRepository.Delete(user);
+                await _userRepository.SaveChangesAsync();
+            }
+        }
 
-            await _userRepository.AddAsync(user);
-            await _userRepository.SaveChangesAsync();
-            return user;
+        public async Task<IEnumerable<User>> FindAsync(Expression<Func<User, bool>> predicate)
+        {
+            return await _userRepository.FindAsync(predicate);
         }
 
         public async Task<IEnumerable<User>> GetAllAsync()
@@ -44,24 +46,31 @@ namespace StudentAutomationAPI.Services.Implementations
             return await _userRepository.GetByIdAsync(id);
         }
 
-        public Task<IEnumerable<User>> FindAsync(Expression<Func<User, bool>> predicate)
+        public async Task<User?> LoginAsync(string email, string password)
         {
-            throw new NotImplementedException();
+            var user = (await _userRepository.FindAsync(u => u.Email == email)).FirstOrDefault();
+            if (user == null) return null;
+
+            // hash dogrulama
+            bool isValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            return isValid ? user : null;
         }
 
-        public Task<User> AddAsync(User entity)
+        public async Task<User> RegisterAsync(User user)
         {
-            throw new NotImplementedException();
+            // hash password
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+
+            await _userRepository.AddAsync(user);
+            await _userRepository.SaveChangesAsync();
+            return user;
         }
 
-        public Task<User> UpdateAsync(User entity)
+        public async Task<User> UpdateAsync(User entity)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task DeleteAsync(Guid id)
-        {
-            throw new NotImplementedException();
+            _userRepository.Update(entity);
+            await _userRepository.SaveChangesAsync();
+            return entity;
         }
     }
 }

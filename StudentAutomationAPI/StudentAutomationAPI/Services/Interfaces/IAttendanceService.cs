@@ -4,7 +4,7 @@ namespace StudentAutomationAPI.Services.Interfaces
 {
     public interface IAttendanceService: IGenericService<Attendance>
     {
-        Task AddAttendanceAsync(Guid studentId, Guid courseId, DateTime date, string status);
+        Task AddAttendanceAsync(Guid studentId, Guid courseId, DateTime date, AttendanceStatus status);
         Task<IEnumerable<Attendance>> GetByStudentIdAsync(Guid studentId);
     }
 }

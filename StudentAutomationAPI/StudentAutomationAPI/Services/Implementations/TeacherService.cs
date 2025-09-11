@@ -6,13 +6,17 @@ namespace StudentAutomationAPI.Services.Implementations
 {
     public class TeacherService : GenericService<Teacher>, ITeacherService
     {
-        public TeacherService(IGenericRepository<Teacher> repository) : base(repository)
+        private readonly ITeacherRepository teacherRepository;
+        private readonly ICourseRepository _courseRepository;
+        public TeacherService(ITeacherRepository repository, ICourseRepository courseRepository) : base(repository)
         {
+            teacherRepository = repository;
+            _courseRepository = courseRepository;
         }
 
-        public Task<IEnumerable<Course>> GetCoursesAsync(Guid teacherId)
+        public async Task<IEnumerable<Course>> GetCoursesAsync(Guid teacherId)
         {
-            throw new NotImplementedException();
+            return await _courseRepository.FindAsync(c => c.TeacherId == teacherId);
         }
     }
 }

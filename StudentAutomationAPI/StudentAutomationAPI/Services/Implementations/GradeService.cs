@@ -1,23 +1,34 @@
 ﻿using StudentAutomationAPI.Services.Interfaces;
 using StudentAutomationAPI.Entities;
 using StudentAutomationAPI.Repositories.Implementations;
+using StudentAutomationAPI.DTO;
 
 namespace StudentAutomationAPI.Services.Implementations
 {
     public class GradeService : GenericService<Grade>, IGradeService
     {
+        private readonly IGenericRepository<Grade> _gradeRepository;
+
         public GradeService(IGenericRepository<Grade> repository) : base(repository)
         {
+            _gradeRepository = repository;
         }
 
-        public Task AddGradeAsync(Guid studentId, Guid courseId, double value)
+        public async Task AddGradeAsync(GradeCreateDto dto )
         {
-            throw new NotImplementedException();
+            var grade = new Grade
+            {
+                StudentId = dto.StudentId,
+                CourseId = dto.CourseId,
+                GradeValue = dto.Value,
+            };
+
+            await _gradeRepository.AddAsync(grade);
         }
 
-        public Task<IEnumerable<Grade>> GetByStudentIdAsync(Guid studentId)
+        public async Task<IEnumerable<Grade>> GetByStudentIdAsync(Guid studentId)
         {
-            throw new NotImplementedException();
+            return await _gradeRepository.FindAsync(g => g.StudentId == studentId);
         }
     }
 }
