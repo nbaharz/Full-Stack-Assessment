@@ -72,3 +72,13 @@ docker exec -it student_backend dotnet ef database update --project StudentAutom
 - **Email**: `student@test.com`  
 - **Password**: `Student123!`  
 
+## Bonus Features
+
+- **Docker Support**  
+  The backend (ASP.NET Core API) and PostgreSQL database are containerized with **Docker Compose** for easy setup and deployment.  
+
+- **Swagger / API Documentation**  
+  The project includes **Swagger (OpenAPI)** for exploring and testing the backend API endpoints interactively.  
+
+- **Clean Code Principles**  
+  The codebase follows **clean code practices** such as separation of concerns, consistent naming, repository-service pattern, and layered architecture for better maintainability.  
