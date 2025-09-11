@@ -27,17 +27,48 @@ Key Features:
 ## Installation & Run Instructions (with Docker)
 
 ### 1. Clone the repository
-bash
+```bash
 git clone https://github.com/nbaharz/Full-Stack-Assessment.git
 cd Full-Stack-Assessment
+```
 
-### 2. Create .env file
+### 2. Create `.env` file
+```env
 CONNECTION_STRING=Host=student_postgres;Port=5432;Database=studentdb;Username=postgres;Password=postgres
+```
 
-### 3. Run with docker compose
+> Update `Username` and `Password` according to your `docker-compose.yml` configuration.  
+
+### 3. Run with Docker Compose
+```bash
 docker-compose up --build
+```
 
-### Apply Migrations
+- **Backend API** → `http://localhost:7117/swagger`  
+- **Frontend (Blazor UI)** → `http://localhost:5001`  
+- **PostgreSQL** → `localhost:5432`  
+
+### 4. Apply Migrations
+If the database is empty, apply EF Core migrations inside the backend container:
+```bash
 docker exec -it student_backend dotnet ef database update --project StudentAutomationAPI
+```
 
+(`student_backend` → replace with your backend container name if different.)  
+
+---
+
+## Test User Accounts
+
+### Admin
+- **Email**: `admin@test.com`  
+- **Password**: `Admin123!`  
+
+### Teacher
+- **Email**: `teacher@test.com`  
+- **Password**: `Teacher123!`  
+
+### Student
+- **Email**: `student@test.com`  
+- **Password**: `Student123!`  
 
