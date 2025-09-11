@@ -10,7 +10,6 @@ namespace StudentAutomationAPI.DI
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddScoped<ICourseStudentRepository, CourseStudentRepository>();
-            services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<IGradeRepository, GradeRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();

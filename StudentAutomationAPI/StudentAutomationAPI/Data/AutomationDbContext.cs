@@ -14,6 +14,7 @@ namespace StudentAutomationAPI.Data
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<Teacher> Teachers { get; set; } = null!;
         public DbSet<Course> Courses { get; set; } = null!;
+        public DbSet<CourseStudent> CourseStudents { get; set; } = null!;
 
         // İlişki tablolari
         public DbSet<Enrollment> Enrollments { get; set; } = null!;

@@ -1,6 +1,9 @@
-﻿namespace StudentAutomationAPI.Services.Interfaces
+﻿using StudentAutomationAPI.Entities;
+
+namespace StudentAutomationAPI.Services.Interfaces
 {
-    public class IStudentService
+    public interface IStudentService: IGenericService<Student>
     {
+        Task<Student?> GetOwnProfileAsync(Guid studentId);
     }
 }

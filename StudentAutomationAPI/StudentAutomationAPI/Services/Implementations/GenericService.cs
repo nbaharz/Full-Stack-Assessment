@@ -49,8 +49,8 @@ namespace StudentAutomationAPI.Services.Implementations
             if (entity != null)
             {
                 _repository.Delete(entity);
-                await _repository.SaveChangesAsync();
             }
+            await _repository.SaveChangesAsync();
         }
     }
 }

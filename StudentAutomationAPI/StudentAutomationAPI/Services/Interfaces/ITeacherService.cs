@@ -1,6 +1,9 @@
-﻿namespace StudentAutomationAPI.Services.Interfaces
+﻿using StudentAutomationAPI.Entities;
+
+namespace StudentAutomationAPI.Services.Interfaces
 {
-    public class ITeacherService
+    public interface ITeacherService: IGenericService<Teacher>
     {
+        Task<IEnumerable<Course>> GetCoursesAsync(Guid teacherId);
     }
 }

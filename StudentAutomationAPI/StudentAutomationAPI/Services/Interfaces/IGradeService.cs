@@ -1,6 +1,10 @@
-﻿namespace StudentAutomationAPI.Services.Interfaces
+﻿using StudentAutomationAPI.Entities;
+
+namespace StudentAutomationAPI.Services.Interfaces
 {
-    public class IGradeService
+    public interface IGradeService: IGenericService<Grade>
     {
+        Task<IEnumerable<Grade>> GetByStudentIdAsync(Guid studentId);
+        Task AddGradeAsync(Guid studentId, Guid courseId, double value);
     }
 }

@@ -1,6 +1,11 @@
-﻿namespace StudentAutomationAPI.Services.Interfaces
+﻿using StudentAutomationAPI.DTO;
+using StudentAutomationAPI.Entities;
+
+namespace StudentAutomationAPI.Services.Interfaces
 {
-    public class ICourseService
+    public interface ICourseService: IGenericService<Course>
     {
+        Task AddCourseAsync(CourseCreateDto dto);
+        Task UpdateCourseStatusAsync(Guid courseId, string status);
     }
 }

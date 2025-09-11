@@ -24,6 +24,7 @@ namespace StudentAutomationAPI
 
             //Dependency Injection
             RepositoryDI.Init(builder.Services);
+            ServiceDI.Init(builder.Services);
 
             var app = builder.Build();
 
