@@ -8,6 +8,8 @@ namespace StudentAutomationAPI.DI
     {
         public static void Init(IServiceCollection services)
         {
+            services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+
             services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICourseService, CourseService>();

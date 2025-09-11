@@ -6,6 +6,8 @@ namespace StudentAutomationAPI.DI
     {
         public static void Init(IServiceCollection services)
         {
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
             services.AddScoped<IAttendanceRepository, AttendanceRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<ICourseRepository, CourseRepository>();
@@ -15,6 +17,8 @@ namespace StudentAutomationAPI.DI
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<ITeacherRepository, TeacherRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+
+
 
         }
     }

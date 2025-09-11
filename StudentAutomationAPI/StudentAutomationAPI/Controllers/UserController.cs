@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StudentAutomationAPI.Entities;
 using StudentAutomationAPI.Services;
 using StudentAutomationAPI.DTO;
@@ -8,6 +9,7 @@ namespace StudentAutomationAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -18,33 +20,70 @@ namespace StudentAutomationAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllAsync();
-            return Ok(users);
+
+            // UserDto map
+            var result = users.Select(u => new UserDto
+            {
+                Email = u.Email,
+                FullName = u.FullName,
+                Role = u.Role
+            });
+
+            return Ok(result);
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var user = await _userService.GetByIdAsync(id);
             if (user == null) return NotFound();
-            return Ok(user);
+
+            var result = new UserDto
+            {
+                Email = user.Email,
+                FullName = user.FullName,
+                Role = user.Role
+            };
+
+            return Ok(result);
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(User user)
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            var created = await _userService.RegisterAsync(user);
-            return Ok(created);
+            var created = await _userService.RegisterAsync(dto);
+
+            var result = new UserDto
+            {
+                Email = created.Email,
+                FullName = created.FullName,
+                Role = created.Role
+            };
+
+            return Ok(result);
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var user = await _userService.LoginAsync(dto.Email, dto.Password);
             if (user == null) return Unauthorized();
-            return Ok(user);
+
+            var result = new UserDto
+            {
+                Email = user.Email,
+                FullName = user.FullName,
+                Role = user.Role
+            };
+
+            return Ok(result);
         }
     }
 

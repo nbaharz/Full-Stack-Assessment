@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using StudentAutomationAPI.DTO;
 using StudentAutomationAPI.Entities;
 using StudentAutomationAPI.Repositories.Implementations;
 using StudentAutomationAPI.Services.Interfaces;
@@ -56,13 +57,21 @@ namespace StudentAutomationAPI.Services.Implementations
             return isValid ? user : null;
         }
 
-        public async Task<User> RegisterAsync(User user)
+        public async Task<User> RegisterAsync(RegisterDto dto)
         {
-            // hash password
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
+            var user = new User
+            {
+                Email = dto.Email,
+                FullName = dto.FullName,
+                PasswordHash = hashedPassword,
+                Role = dto.Role
+            };
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
+
             return user;
         }
 
