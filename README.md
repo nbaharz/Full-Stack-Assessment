@@ -59,7 +59,7 @@ docker exec -it student_backend dotnet ef database update --project StudentAutom
 ---
 
 ## Test User Accounts
-
+To use test user accounts you need to run StudentAutomationAPI once.
 ### Admin
 - **Email**: `admin@test.com`  
 - **Password**: `Admin123!`  
@@ -71,6 +71,7 @@ docker exec -it student_backend dotnet ef database update --project StudentAutom
 ### Student
 - **Email**: `student@test.com`  
 - **Password**: `Student123!`  
+
 
 ## Bonus Features
 
