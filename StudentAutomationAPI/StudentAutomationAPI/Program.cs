@@ -9,7 +9,7 @@ namespace StudentAutomationAPI
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +22,7 @@ namespace StudentAutomationAPI
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
 
             // Dependency Injection
             RepositoryDI.Init(builder.Services);
@@ -64,6 +65,12 @@ namespace StudentAutomationAPI
                 });
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AutomationDbContext>();
+                await AutomationDbContextSeed.SeedAsync(db);
+            }
 
             // Swagger
             app.UseSwagger();

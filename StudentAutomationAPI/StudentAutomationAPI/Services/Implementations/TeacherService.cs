@@ -1,6 +1,7 @@
 ﻿using StudentAutomationAPI.Services.Interfaces;
 using StudentAutomationAPI.Entities;
 using StudentAutomationAPI.Repositories.Implementations;
+using StudentAutomationAPI.DTO;
 
 namespace StudentAutomationAPI.Services.Implementations
 {
@@ -12,6 +13,11 @@ namespace StudentAutomationAPI.Services.Implementations
         {
             teacherRepository = repository;
             _courseRepository = courseRepository;
+        }
+
+        public Task<Teacher> CreateTeacherAsync(TeacherDto dto)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<Course>> GetCoursesAsync(Guid teacherId)
