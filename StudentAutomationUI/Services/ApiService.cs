@@ -45,6 +45,9 @@ namespace StudentAutomationUI.Services
         public Task<HttpResponseMessage> GetStudentByIdAsync(Guid id)
             => _httpClient.GetAsync($"api/Student/{id}");
 
+        public Task<HttpResponseMessage> GetStudentMeAsync()
+            => _httpClient.GetAsync("api/Student/me");
+
         public Task<HttpResponseMessage> CreateStudentAsync(object student)
             => _httpClient.PostAsJsonAsync("api/Student", student);
 

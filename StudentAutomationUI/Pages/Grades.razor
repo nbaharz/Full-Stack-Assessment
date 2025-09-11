@@ -1,0 +1,124 @@
+@page "/grades"
+@using StudentAutomationUI.Services
+@inject AuthService AuthService
+@inject IApiService Api
+
+<PageTitle>Grades</PageTitle>
+
+@if (!AuthService.IsAuthenticated)
+{
+    <div class="container mt-5"><div class="alert alert-warning">Please login</div></div>
+}
+else if (AuthService.CurrentUser?.Role == UserRole.Student)
+{
+    <div class="container mt-4">
+        <h3>My Grades</h3>
+        @if (myGrades == null)
+        {
+            <div>Loading...</div>
+        }
+        else if (myGrades.Count == 0)
+        {
+            <div class="alert alert-info">No grades found.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead><tr><th>Course</th><th>Exam</th><th>Score</th><th>Date</th></tr></thead>
+                    <tbody>
+                        @foreach (var g in myGrades)
+                        {
+                            <tr>
+                                <td>@g.CourseId</td>
+                                <td>@g.ExamType</td>
+                                <td>@g.Score</td>
+                                <td>@g.ExamDate.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Add Grade (Teacher)</h3>
+        </div>
+        <EditForm Model="grade" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <div class="row g-2">
+                <div class="col-md-4"><InputText class="form-control" placeholder="StudentId (GUID)" @bind-Value="grade.StudentIdText" /></div>
+                <div class="col-md-4"><InputText class="form-control" placeholder="CourseId (GUID)" @bind-Value="grade.CourseIdText" /></div>
+                <div class="col-md-4"><InputText class="form-control" placeholder="Exam Type" @bind-Value="grade.ExamType" /></div>
+            </div>
+            <div class="row g-2 mt-2">
+                <div class="col-md-4"><InputNumber class="form-control" @bind-Value="grade.Score" /></div>
+                <div class="col-md-4"><InputDate DateFormat="yyyy-MM-dd" class="form-control" @bind-Value="grade.ExamDate" /></div>
+            </div>
+            <div class="mt-2">
+                <button class="btn btn-success" type="submit">Save</button>
+            </div>
+        </EditForm>
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-info mt-3">@message</div>
+        }
+    </div>
+}
+
+@code {
+    private GradeModel grade = new();
+    private List<ApiGrade>? myGrades;
+    private string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthService.CurrentUser?.Role == UserRole.Student)
+        {
+            var me = await Api.GetStudentMeAsync();
+            if (me.IsSuccessStatusCode)
+            {
+                var student = await me.Content.ReadFromJsonAsync<ApiStudent>();
+                if (student != null)
+                {
+                    var resp = await Api.GetGradesByStudentAsync(student.Id);
+                    if (resp.IsSuccessStatusCode)
+                    {
+                        myGrades = await resp.Content.ReadFromJsonAsync<List<ApiGrade>>();
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task Save()
+    {
+        message = string.Empty;
+        if (!Guid.TryParse(grade.StudentIdText, out var studentId) || !Guid.TryParse(grade.CourseIdText, out var courseId))
+        {
+            message = "Invalid GUIDs";
+            return;
+        }
+        var resp = await Api.AddGradeAsync(new { studentId, courseId, examType = grade.ExamType, score = grade.Score, examDate = grade.ExamDate });
+        message = resp.IsSuccessStatusCode ? "Saved" : $"Failed: {resp.StatusCode}";
+    }
+
+    public class GradeModel
+    {
+        [Required]
+        public string StudentIdText { get; set; } = string.Empty;
+        [Required]
+        public string CourseIdText { get; set; } = string.Empty;
+        [Required]
+        public string ExamType { get; set; } = string.Empty;
+        [Range(0,100)]
+        public double Score { get; set; } = 0;
+        public DateTime ExamDate { get; set; } = DateTime.Today;
+    }
+}
+
+

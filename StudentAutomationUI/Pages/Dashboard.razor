@@ -2,7 +2,7 @@
 @using StudentAutomationUI.Services
 @using StudentAutomationUI.Models
 @inject AuthService AuthService
-@inject DataService DataService
+@inject IApiService Api
 @inject NavigationManager Navigation
 
 <PageTitle>Dashboard</PageTitle>
@@ -77,44 +77,154 @@
                     </div>
                 </div>
 
-                <div class="col-md-3 mb-4">
-                    <div class="card bg-warning text-white">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <h4>@gradeCount</h4>
-                                    <p class="mb-0">Grades</p>
-                                </div>
-                                <i class="fas fa-graduation-cap fa-2x"></i>
+                
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-lg-4 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Students</h5>
+                            <div>
+                                <a class="btn btn-sm btn-outline-primary me-2" href="/students">All</a>
+                                <button class="btn btn-sm btn-primary" @onclick="() => showCreateStudent = true">Add</button>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <a href="/grades" class="text-white text-decoration-none">View Details</a>
+                        <div class="card-body">
+                            @if (adminStudents == null)
+                            {
+                                <div>Loading...</div>
+                            }
+                            else if (adminStudents.Count == 0)
+                            {
+                                <div class="text-muted">No students</div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead><tr><th>Student No</th><th>Id</th></tr></thead>
+                                        <tbody>
+                                            @foreach (var s in adminStudents.Take(10))
+                                            {
+                                                <tr>
+                                                    <td>@s.StudentNumber</td>
+                                                    <td class="text-muted small">@s.Id</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                        @if (showCreateStudent)
+                        {
+                            <div class="card-footer">
+                                <EditForm Model="createStudent" OnValidSubmit="CreateStudentViaRegister">
+                                    <DataAnnotationsValidator />
+                                    <div class="row g-2">
+                                        <div class="col-md-4"><InputText class="form-control" placeholder="Full name" @bind-Value="createStudent.FullName" /></div>
+                                        <div class="col-md-4"><InputText class="form-control" placeholder="Email" @bind-Value="createStudent.Email" /></div>
+                                        <div class="col-md-3"><InputText class="form-control" placeholder="Password" @bind-Value="createStudent.Password" /></div>
+                                        <div class="col-md-1 d-grid"><button class="btn btn-primary" type="submit">Add</button></div>
+                                    </div>
+                                    <div class="mt-2"><button class="btn btn-link btn-sm" type="button" @onclick="() => showCreateStudent = false">Close</button></div>
+                                </EditForm>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-3">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Teachers</h5>
+                            <div>
+                                <a class="btn btn-sm btn-outline-success me-2" href="/teachers">All</a>
+                                <button class="btn btn-sm btn-success" @onclick="() => showCreateTeacher = true">Add</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @if (adminTeachers == null)
+                            {
+                                <div>Loading...</div>
+                            }
+                            else if (adminTeachers.Count == 0)
+                            {
+                                <div class="text-muted">No teachers</div>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead><tr><th>Department</th><th>Id</th></tr></thead>
+                                        <tbody>
+                                            @foreach (var t in adminTeachers.Take(10))
+                                            {
+                                                <tr>
+                                                    <td>@t.Department</td>
+                                                    <td class="text-muted small">@t.Id</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            @if (showCreateTeacher)
+                            {
+                                <div class="mt-3">
+                                    <EditForm Model="createTeacher" OnValidSubmit="CreateTeacherViaRegister">
+                                        <DataAnnotationsValidator />
+                                        <div class="row g-2">
+                                            <div class="col-md-4"><InputText class="form-control" placeholder="Full name" @bind-Value="createTeacher.FullName" /></div>
+                                            <div class="col-md-4"><InputText class="form-control" placeholder="Email" @bind-Value="createTeacher.Email" /></div>
+                                            <div class="col-md-3"><InputText class="form-control" placeholder="Password" @bind-Value="createTeacher.Password" /></div>
+                                            <div class="col-md-1 d-grid"><button class="btn btn-success" type="submit">Add</button></div>
+                                        </div>
+                                        <div class="mt-2"><button class="btn btn-link btn-sm" type="button" @onclick="() => showCreateTeacher = false">Close</button></div>
+                                    </EditForm>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-12">
+                <div class="col-lg-4 mb-3">
                     <div class="card">
-                        <div class="card-header">
-                            <h5>Quick Actions</h5>
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Courses</h5>
+                            <a class="btn btn-sm btn-outline-info" href="/courses">All</a>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3 mb-2">
-                                    <a href="/students" class="btn btn-outline-primary w-100">Manage Students</a>
-                                </div>
-                                <div class="col-md-3 mb-2">
-                                    <a href="/teachers" class="btn btn-outline-success w-100">Manage Teachers</a>
-                                </div>
-                                <div class="col-md-3 mb-2">
-                                    <a href="/courses" class="btn btn-outline-info w-100">Manage Courses</a>
-                                </div>
-                                <div class="col-md-3 mb-2">
-                                    <a href="/grades" class="btn btn-outline-warning w-100">Manage Grades</a>
-                                </div>
+                            @if (adminCourses == null)
+                            {
+                                <div>Loading...</div>
+                            }
+                            else if (adminCourses.Count == 0)
+                            {
+                                <div class="text-muted">No courses</div>
+                            }
+                            else
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var c in adminCourses.Take(10))
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between"><span>@c.Name</span><span class="text-muted small">@c.TeacherId</span></li>
+                                    }
+                                </ul>
+                            }
+                            <div class="mt-3">
+                                <EditForm Model="quickCourse" OnValidSubmit="CreateCourseQuick">
+                                    <DataAnnotationsValidator />
+                                    <div class="row g-2">
+                                        <div class="col-4"><InputText class="form-control" placeholder="Name" @bind-Value="quickCourse.Name" /></div>
+                                        <div class="col-5"><InputText class="form-control" placeholder="Description" @bind-Value="quickCourse.Description" /></div>
+                                        <div class="col-3"><InputText class="form-control" placeholder="TeacherId" @bind-Value="quickCourse.TeacherIdText" /></div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <button class="btn btn-primary btn-sm" type="submit">Add Course</button>
+                                    </div>
+                                </EditForm>
                             </div>
                         </div>
                     </div>
@@ -198,27 +308,89 @@ else
     private int studentCount = 0;
     private int teacherCount = 0;
     private int courseCount = 0;
-    private int gradeCount = 0;
+    private List<ApiStudent>? adminStudents;
+    private List<ApiTeacher>? adminTeachers;
+    private List<ApiCourse>? adminCourses;
+    private QuickCourseModel quickCourse = new();
+    private bool showCreateStudent = false;
+    private bool showCreateTeacher = false;
+    private CreateUserModel createStudent = new();
+    private CreateUserModel createTeacher = new();
 
     protected override async Task OnInitializedAsync()
     {
-        if (AuthService.IsAuthenticated)
+        if (!AuthService.IsAuthenticated) return;
+        var st = await Api.GetStudentsAsync();
+        if (st.IsSuccessStatusCode)
         {
-            var students = await DataService.GetStudentsAsync();
-            var teachers = await DataService.GetTeachersAsync();
-            var courses = await DataService.GetCoursesAsync();
-            var grades = await DataService.GetGradesAsync();
-
-            studentCount = students.Count;
-            teacherCount = teachers.Count;
-            courseCount = courses.Count;
-            gradeCount = grades.Count;
+            var list = await st.Content.ReadFromJsonAsync<List<ApiStudent>>();
+            studentCount = list?.Count ?? 0;
+            adminStudents = list ?? new List<ApiStudent>();
         }
+        var tt = await Api.GetTeachersAsync();
+        if (tt.IsSuccessStatusCode)
+        {
+            var list = await tt.Content.ReadFromJsonAsync<List<ApiTeacher>>();
+            teacherCount = list?.Count ?? 0;
+            adminTeachers = list ?? new List<ApiTeacher>();
+        }
+        var cc = await Api.GetCoursesAsync();
+        if (cc.IsSuccessStatusCode)
+        {
+            var list = await cc.Content.ReadFromJsonAsync<List<ApiCourse>>();
+            courseCount = list?.Count ?? 0;
+            adminCourses = list ?? new List<ApiCourse>();
+        }
+        // gradeCount can be derived per student; leaving 0 or future endpoint
     }
 
     private void Logout()
     {
         AuthService.Logout();
         Navigation.NavigateTo("/login");
+    }
+
+    private async Task CreateCourseQuick()
+    {
+        if (!Guid.TryParse(quickCourse.TeacherIdText, out var teacherId)) return;
+        var resp = await Api.CreateCourseAsync(new { name = quickCourse.Name, description = quickCourse.Description, teacherId });
+        if (resp.IsSuccessStatusCode)
+        {
+            quickCourse = new();
+            await OnInitializedAsync();
+        }
+    }
+
+    private async Task CreateStudentViaRegister()
+    {
+        var resp = await Api.RegisterAsync(new { email = createStudent.Email, fullName = createStudent.FullName, password = createStudent.Password, role = 1 });
+        if (resp.IsSuccessStatusCode) { createStudent = new(); showCreateStudent = false; await OnInitializedAsync(); }
+    }
+
+    private async Task CreateTeacherViaRegister()
+    {
+        var resp = await Api.RegisterAsync(new { email = createTeacher.Email, fullName = createTeacher.FullName, password = createTeacher.Password, role = 2 });
+        if (resp.IsSuccessStatusCode) { createTeacher = new(); showCreateTeacher = false; await OnInitializedAsync(); }
+    }
+
+    public class QuickCourseModel
+    {
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        [Required]
+        public string Description { get; set; } = string.Empty;
+        [Required]
+        public string TeacherIdText { get; set; } = string.Empty;
+    }
+
+    public class CreateUserModel
+    {
+        [Required]
+        public string FullName { get; set; } = string.Empty;
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+        [Required]
+        public string Password { get; set; } = string.Empty;
     }
 }

@@ -19,26 +19,50 @@
                     <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Dashboard
                 </NavLink>
             </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="students">
-                    <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span> Students
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="teachers">
-                    <span class="bi bi-person-badge-fill-nav-menu" aria-hidden="true"></span> Teachers
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="courses">
-                    <span class="bi bi-book-fill-nav-menu" aria-hidden="true"></span> Courses
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="grades">
-                    <span class="bi bi-graph-up-nav-menu" aria-hidden="true"></span> Grades & Attendance
-                </NavLink>
-            </div>
+            @if (AuthService.CurrentUser?.Role == UserRole.Admin)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="students">
+                        <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span> Students
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="teachers">
+                        <span class="bi bi-person-badge-fill-nav-menu" aria-hidden="true"></span> Teachers
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="courses">
+                        <span class="bi bi-book-fill-nav-menu" aria-hidden="true"></span> Courses
+                    </NavLink>
+                </div>
+            }
+            else if (AuthService.CurrentUser?.Role == UserRole.Teacher)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="courses">
+                        <span class="bi bi-book-fill-nav-menu" aria-hidden="true"></span> My Courses
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="grades">
+                        <span class="bi bi-graph-up-nav-menu" aria-hidden="true"></span> Grades & Attendance
+                    </NavLink>
+                </div>
+            }
+            else if (AuthService.CurrentUser?.Role == UserRole.Student)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="courses">
+                        <span class="bi bi-book-fill-nav-menu" aria-hidden="true"></span> My Courses
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="grades">
+                        <span class="bi bi-graph-up-nav-menu" aria-hidden="true"></span> My Grades
+                    </NavLink>
+                </div>
+            }
             <div class="nav-item px-3">
                 <button class="nav-link btn btn-link text-start" @onclick="Logout">
                     <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Logout

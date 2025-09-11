@@ -41,11 +41,11 @@ namespace StudentAutomationAPI.Controllers
         [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetMe()
         {
-            // In a real app, studentId would come from the authenticated user claims
-            if (!Guid.TryParse(User.FindFirst("sub")?.Value, out var studentId))
+           
+            if (!Guid.TryParse(User.FindFirst("sub")?.Value, out var userId))
                 return Unauthorized();
 
-            var me = await _studentService.GetOwnProfileAsync(studentId);
+            var me = await _studentService.GetByUserIdAsync(userId);
             if (me == null) return NotFound();
             return Ok(me);
         }

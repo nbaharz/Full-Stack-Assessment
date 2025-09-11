@@ -20,9 +20,9 @@ namespace StudentAutomationUI.Services
             // Sample Teachers
             _teachers.AddRange(new[]
             {
-                new Teacher { Id = 1, TeacherNumber = "T001", FirstName = "John", LastName = "Doe", Email = "john.doe@school.com", Phone = "555-0101", Department = "Mathematics" },
-                new Teacher { Id = 2, TeacherNumber = "T002", FirstName = "Jane", LastName = "Smith", Email = "jane.smith@school.com", Phone = "555-0102", Department = "Physics" },
-                new Teacher { Id = 3, TeacherNumber = "T003", FirstName = "Bob", LastName = "Johnson", Email = "bob.johnson@school.com", Phone = "555-0103", Department = "Chemistry" }
+                new Teacher { Id = Guid.NewGuid(), TeacherNumber = "T001", FirstName = "John", LastName = "Doe", Email = "john.doe@school.com", Phone = "555-0101", Department = "Mathematics" },
+                new Teacher { Id = Guid.NewGuid(), TeacherNumber = "T002", FirstName = "Jane", LastName = "Smith", Email = "jane.smith@school.com", Phone = "555-0102", Department = "Physics" },
+                new Teacher { Id = Guid.NewGuid(), TeacherNumber = "T003", FirstName = "Bob", LastName = "Johnson", Email = "bob.johnson@school.com", Phone = "555-0103", Department = "Chemistry" }
             });
 
             // Sample Courses
@@ -78,7 +78,7 @@ namespace StudentAutomationUI.Services
             return await Task.FromResult(_teachers);
         }
 
-        public async Task<Teacher?> GetTeacherAsync(int id)
+        public async Task<Teacher?> GetTeacherAsync(Guid id)
         {
             return await Task.FromResult(_teachers.FirstOrDefault(t => t.Id == id));
         }

@@ -1,0 +1,149 @@
+@page "/courses"
+@using StudentAutomationUI.Services
+@using StudentAutomationUI.Models
+@inject AuthService AuthService
+@inject IApiService Api
+
+<PageTitle>Courses</PageTitle>
+
+@if (!AuthService.IsAuthenticated)
+{
+    <div class="container mt-5"><div class="alert alert-warning">Please login</div></div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Courses</h2>
+            @if (AuthService.CurrentUser?.Role == UserRole.Admin)
+            {
+                <button class="btn btn-primary" @onclick="() => showCreate = true">New Course</button>
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                @if (courses == null)
+                {
+                    <div>Loading...</div>
+                }
+                else if (courses.Count == 0)
+                {
+                    <div>No courses found.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th><th>Description</th><th>TeacherId</th><th>Status</th>
+                                    @if (AuthService.CurrentUser?.Role == UserRole.Teacher)
+                                    {
+                                        <th>Actions</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in courses)
+                                {
+                                    <tr>
+                                        <td>@c.Name</td>
+                                        <td>@c.Description</td>
+                                        <td>@c.TeacherId</td>
+                                        <td>@c.Status</td>
+                                        @if (AuthService.CurrentUser?.Role == UserRole.Teacher)
+                                        {
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-secondary me-2" @onclick="() => UpdateStatus(c.Id, StatusStarted)">Start</button>
+                                                <button class="btn btn-sm btn-outline-success" @onclick="() => UpdateStatus(c.Id, StatusFinished)">Finish</button>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (showCreate)
+        {
+            <div class="card mt-3">
+                <div class="card-header">Create Course</div>
+                <div class="card-body">
+                    <EditForm Model="createModel" OnValidSubmit="CreateCourse">
+                        <DataAnnotationsValidator />
+                        <div class="row g-2">
+                            <div class="col-md-4"><InputText class="form-control" placeholder="Name" @bind-Value="createModel.Name" /></div>
+                            <div class="col-md-5"><InputText class="form-control" placeholder="Description" @bind-Value="createModel.Description" /></div>
+                            <div class="col-md-3"><InputText class="form-control" placeholder="TeacherId" @bind-Value="createModel.TeacherIdText" /></div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="submit" class="btn btn-success">Create</button>
+                            <button class="btn btn-link" type="button" @onclick="() => showCreate = false">Cancel</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<ApiCourse> courses = new();
+    private bool showCreate = false;
+    private CreateCourseModel createModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCourses();
+    }
+
+    private async Task LoadCourses()
+    {
+        var resp = await Api.GetCoursesAsync();
+        if (resp.IsSuccessStatusCode)
+        {
+            var list = await resp.Content.ReadFromJsonAsync<List<ApiCourse>>();
+            courses = list ?? new List<ApiCourse>();
+        }
+    }
+
+    private async Task CreateCourse()
+    {
+        if (!Guid.TryParse(createModel.TeacherIdText, out var teacherId)) return;
+        var resp = await Api.CreateCourseAsync(new { name = createModel.Name, description = createModel.Description, teacherId });
+        if (resp.IsSuccessStatusCode)
+        {
+            showCreate = false;
+            createModel = new();
+            await LoadCourses();
+        }
+    }
+
+    private async Task UpdateStatus(Guid id, string status)
+    {
+        var resp = await Api.UpdateCourseStatusAsync(id, status);
+        if (resp.IsSuccessStatusCode)
+        {
+            await LoadCourses();
+        }
+    }
+
+    private const string StatusStarted = "Started";
+    private const string StatusFinished = "Finished";
+
+    public class CreateCourseModel
+    {
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        [Required]
+        public string Description { get; set; } = string.Empty;
+        [Required]
+        public string TeacherIdText { get; set; } = string.Empty;
+    }
+}
+
+

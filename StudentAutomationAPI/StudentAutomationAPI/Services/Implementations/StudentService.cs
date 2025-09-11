@@ -1,6 +1,7 @@
-﻿using StudentAutomationAPI.Services.Interfaces;
+﻿using StudentAutomationAPI.DTO;
 using StudentAutomationAPI.Entities;
 using StudentAutomationAPI.Repositories.Implementations;
+using StudentAutomationAPI.Services.Interfaces;
 
 namespace StudentAutomationAPI.Services.Implementations
 {
@@ -18,5 +19,28 @@ namespace StudentAutomationAPI.Services.Implementations
             var students = await _studentRepository.FindAsync(s => s.Id == studentId);
             return students.FirstOrDefault();
         }
+
+        public async Task<Student?> GetByUserIdAsync(Guid userId)
+        {
+            var students = await _studentRepository.FindAsync(s => s.UserId == userId);
+            return students.FirstOrDefault();
+        }
+
+        public async Task<Student> CreateStudentAsync(StudentCreateDto dto)
+        {
+            var student = new Student
+            {
+                UserId = dto.UserId,
+                FullName = dto.FullName,
+                StudentNumber = dto.StudentNumber
+            };
+
+            await _studentRepository.AddAsync(student);
+            await _studentRepository.SaveChangesAsync();
+
+            return student;
+        }
+
+
     }
 }

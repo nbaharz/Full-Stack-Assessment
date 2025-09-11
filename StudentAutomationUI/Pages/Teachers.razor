@@ -1,0 +1,188 @@
+@page "/teachers"
+@using StudentAutomationUI.Services
+@using StudentAutomationUI.Models
+@inject AuthService AuthService
+@inject IApiService Api
+@inject NavigationManager Navigation
+
+<PageTitle>Teachers</PageTitle>
+
+@if (!AuthService.IsAuthenticated || AuthService.CurrentUser?.Role != UserRole.Admin)
+{
+    <div class="container mt-5">
+        <div class="alert alert-warning">Unauthorized</div>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Teachers</h2>
+            <button class="btn btn-primary" @onclick="() => showCreate = true">Add Teacher</button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                @if (teachers == null)
+                {
+                    <div>Loading...</div>
+                }
+                else if (teachers.Count == 0)
+                {
+                    <div>No teachers found.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var t in teachers)
+                                {
+                                    <tr>
+                                        <td>@t.FirstName @t.LastName</td>
+                                        <td>@t.Email</td>
+                                        <td>@t.Department</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => StartEdit(t)">Edit</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @if (showCreate)
+        {
+            <div class="card mt-3">
+                <div class="card-header">Add Teacher</div>
+                <div class="card-body">
+                    <EditForm Model="createModel" OnValidSubmit="CreateTeacher">
+                        <DataAnnotationsValidator />
+
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <InputText class="form-control" placeholder="First Name" @bind-Value="createModel.FirstName" />
+                            </div>
+                            <div class="col-md-3">
+                                <InputText class="form-control" placeholder="Last Name" @bind-Value="createModel.LastName" />
+                            </div>
+                            <div class="col-md-3">
+                                <InputText class="form-control" placeholder="Email" @bind-Value="createModel.Email" />
+                            </div>
+                            <div class="col-md-3">
+                                <InputText class="form-control" placeholder="Department" @bind-Value="createModel.Department" />
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-link" @onclick="() => showCreate = false">Cancel</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        }
+
+        @if (editModel != null)
+        {
+            <div class="card mt-3">
+                <div class="card-header">Edit Teacher</div>
+                <div class="card-body">
+                    <EditForm Model="editModel" OnValidSubmit="UpdateTeacher">
+                        <DataAnnotationsValidator />
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <InputText class="form-control" @bind-Value="editModel.Department" />
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="button" class="btn btn-link" @onclick="() => editModel = null">Cancel</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Teacher> teachers = new();
+    private bool showCreate = false;
+    private CreateTeacherModel createModel = new();
+    private EditTeacherModel? editModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTeachers();
+    }
+
+    private async Task LoadTeachers()
+    {
+        var resp = await Api.GetTeachersAsync();
+        if (resp.IsSuccessStatusCode)
+        {
+            var list = await resp.Content.ReadFromJsonAsync<List<Teacher>>();
+            teachers = list ?? new List<Teacher>();
+        }
+    }
+
+    private async Task CreateTeacher()
+    {
+        var resp = await Api.CreateTeacherAsync(new { userId = Guid.Empty, department = createModel.Department });
+        if (resp.IsSuccessStatusCode)
+        {
+            showCreate = false;
+            createModel = new();
+            await LoadTeachers();
+        }
+    }
+
+    private void StartEdit(Teacher t)
+    {
+        editModel = new EditTeacherModel { Id = t.Id, Department = t.Department };
+    }
+
+    private async Task UpdateTeacher()
+    {
+        if (editModel == null) return;
+        var resp = await Api.UpdateTeacherAsync(editModel.Id, new { id = editModel.Id, department = editModel.Department });
+        if (resp.IsSuccessStatusCode)
+        {
+            editModel = null;
+            await LoadTeachers();
+        }
+    }
+
+    public class CreateTeacherModel
+    {
+        [Required]
+        public string FirstName { get; set; } = string.Empty;
+        [Required]
+        public string LastName { get; set; } = string.Empty;
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+        [Required]
+        public string Department { get; set; } = string.Empty;
+    }
+
+    public class EditTeacherModel
+    {
+        public Guid Id { get; set; }
+        [Required]
+        public string Department { get; set; } = string.Empty;
+    }
+}
+
+

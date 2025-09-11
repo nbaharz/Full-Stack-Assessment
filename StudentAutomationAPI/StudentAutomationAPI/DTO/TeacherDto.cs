@@ -2,7 +2,8 @@
 {
     public class TeacherDto
     {
-        public string fullName { get; set; } = null!;
-        public string Department { get; set; } = null!;
+        public Guid UserId { get; set; }
+        public string FullName { get; set; } = null!;
+        public string? Department { get; set; }
     }
 }

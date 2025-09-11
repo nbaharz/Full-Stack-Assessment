@@ -11,6 +11,7 @@ namespace StudentAutomationUI.Services
         // Students
         Task<HttpResponseMessage> GetStudentsAsync();
         Task<HttpResponseMessage> GetStudentByIdAsync(Guid id);
+        Task<HttpResponseMessage> GetStudentMeAsync();
         Task<HttpResponseMessage> CreateStudentAsync(object student);
         Task<HttpResponseMessage> UpdateStudentAsync(Guid id, object student);
         Task<HttpResponseMessage> DeleteStudentAsync(Guid id);

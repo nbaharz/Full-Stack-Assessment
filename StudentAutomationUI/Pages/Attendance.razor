@@ -1,0 +1,67 @@
+@page "/attendance"
+@using StudentAutomationUI.Services
+@inject AuthService AuthService
+@inject IApiService Api
+
+<PageTitle>Attendance</PageTitle>
+
+@if (!AuthService.IsAuthenticated || AuthService.CurrentUser?.Role != UserRole.Teacher)
+{
+    <div class="container mt-4"><div class="alert alert-warning">Teacher access only</div></div>
+}
+else
+{
+    <div class="container mt-4">
+        <h3>Add Attendance</h3>
+        <EditForm Model="model" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+            <div class="row g-2">
+                <div class="col-md-4"><InputText class="form-control" placeholder="StudentId (GUID)" @bind-Value="model.StudentIdText" /></div>
+                <div class="col-md-4"><InputText class="form-control" placeholder="CourseId (GUID)" @bind-Value="model.CourseIdText" /></div>
+                <div class="col-md-4">
+                    <InputSelect class="form-select" @bind-Value="model.Status">
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                    </InputSelect>
+                </div>
+            </div>
+            <div class="row g-2 mt-2">
+                <div class="col-md-4"><InputDate DateFormat="yyyy-MM-dd" class="form-control" @bind-Value="model.Date" /></div>
+            </div>
+            <div class="mt-2"><button type="submit" class="btn btn-success">Save</button></div>
+        </EditForm>
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="alert alert-info mt-3">@message</div>
+        }
+    </div>
+}
+
+@code {
+    private string message = string.Empty;
+    private AttendanceModel model = new();
+
+    private async Task Save()
+    {
+        if (!Guid.TryParse(model.StudentIdText, out var studentId) || !Guid.TryParse(model.CourseIdText, out var courseId))
+        {
+            message = "Invalid GUIDs";
+            return;
+        }
+        var status = model.Status == "Present" ? 1 : 0;
+        var resp = await Api.AddAttendanceAsync(new { studentId, courseId, date = model.Date, status });
+        message = resp.IsSuccessStatusCode ? "Saved" : $"Failed: {resp.StatusCode}";
+    }
+
+    public class AttendanceModel
+    {
+        [Required]
+        public string StudentIdText { get; set; } = string.Empty;
+        [Required]
+        public string CourseIdText { get; set; } = string.Empty;
+        public DateTime Date { get; set; } = DateTime.Today;
+        public string Status { get; set; } = "Present";
+    }
+}
+
+

@@ -9,10 +9,14 @@ namespace StudentAutomationAPI.Services.Implementations
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ITeacherService _teacherService;
+        private readonly IStudentService _studentService;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, ITeacherService teacherService, IStudentService studentService)
         {
             _userRepository = userRepository;
+            _teacherService = teacherService;
+            _studentService = studentService;
         }
 
         public async Task<User> AddAsync(User entity)
@@ -71,6 +75,18 @@ namespace StudentAutomationAPI.Services.Implementations
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
+
+            // Create role-specific entity for admin-created accounts as well
+            if (user.Role == UserRole.Teacher)
+            {
+                var teacher = new Teacher { UserId = user.Id, Department = string.Empty };
+                await _teacherService.AddAsync(teacher);
+            }
+            else if (user.Role == UserRole.Student)
+            {
+                var student = new Student { UserId = user.Id, StudentNumber = $"S-{DateTime.UtcNow:yyyyMMddHHmmss}" };
+                await _studentService.AddAsync(student);
+            }
 
             return user;
         }
